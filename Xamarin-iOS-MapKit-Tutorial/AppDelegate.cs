@@ -4,6 +4,7 @@ using System.Linq;
 
 using Foundation;
 using UIKit;
+using CoreLocation;
 
 namespace XamariniOSMapKitTutorial
 {
@@ -15,6 +16,9 @@ namespace XamariniOSMapKitTutorial
 	{
 		// class-level declarations
 		UIWindow window;
+		private UINavigationController _navController;
+		private UIViewController _rootViewController;
+		private CLLocationManager _locationManager;
 
 		//
 		// This method is invoked when the application has loaded and is ready to run. In this
@@ -27,12 +31,24 @@ namespace XamariniOSMapKitTutorial
 		{
 			// create a new window instance based on the screen size
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
+
+			// Create a CLLocationManager object
+			_locationManager = new CLLocationManager ();
+
+			// Check the iOS version
+			if (UIDevice.CurrentDevice.CheckSystemVersion (8,0))
+				_locationManager.RequestWhenInUseAuthorization ();
 			
 			// If you have defined a root view controller, set it here:
 			// window.RootViewController = myViewController;
-			
-			// make the window visible
-			window.MakeKeyAndVisible ();
+
+			_navController = new UINavigationController ();
+			_rootViewController = new MapViewController ();
+
+			// Push the view controller onto the navigation controller and show the window
+			_navController.PushViewController(_rootViewController, false);
+			window.RootViewController = _navController;
+			window.MakeKeyAndVisible (); 
 			
 			return true;
 		}
