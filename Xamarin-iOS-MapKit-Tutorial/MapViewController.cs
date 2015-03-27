@@ -9,6 +9,7 @@ using Foundation;
 using UIKit;
 using MapKit;
 using CoreLocation;
+using System.Drawing;
 
 namespace XamariniOSMapKitTutorial
 {
@@ -16,6 +17,8 @@ namespace XamariniOSMapKitTutorial
 	{
 		private MKMapView _mapView;
 		private List<DataModel> _dataList;
+		private UISegmentedControl mapTypes;
+		private UIButton _btnCurrentLocation;
 		private UIButton _annotationDetailButton; // Add this here to avoid the GC
 
 		protected string annotationIdentifier = "AnnotationIdentifier";
@@ -40,14 +43,15 @@ namespace XamariniOSMapKitTutorial
 			// Show the users location
 			_mapView.ShowsUserLocation = true;
 
-			// Add an event handler for when the user moves and the location updates
-			_mapView.DidUpdateUserLocation += (sender, e) => {
+			// Add an event handler for when the user moves and the location updates, if needed. 
+			// This will cause the map to jump to users location everytime it moves, even if the map is panned somewhere else
+			/*_mapView.DidUpdateUserLocation += (sender, e) => {
 				if(_mapView.UserLocation != null) {
 					CLLocationCoordinate2D coords = _mapView.UserLocation.Coordinate;
 					MKCoordinateSpan span = new MKCoordinateSpan(kmToLatitudeDegrees(5), kmToLongitudeDegrees(5, coords.Latitude));
 					_mapView.Region = new MKCoordinateRegion(coords, span);
 				}
-			};
+			};*/
 
 			// If the user denies location permission, or the devices GPS/location is unavailable
 			if (!_mapView.UserLocationVisible) {
@@ -55,6 +59,19 @@ namespace XamariniOSMapKitTutorial
 				MKCoordinateSpan span = new MKCoordinateSpan(kmToLatitudeDegrees(5), kmToLongitudeDegrees(5, coords.Latitude));
 				_mapView.Region = new MKCoordinateRegion (coords, span);
 			}
+
+			// Creates and add a button to center on current location
+			var imageCurrentLocation = UIImage.FromBundle ("images/currentlocation.png");
+			imageCurrentLocation.ImageWithRenderingMode (UIImageRenderingMode.Automatic);
+
+			_btnCurrentLocation = new UIButton () { TintColor = UIColor.Black };
+			_btnCurrentLocation.SetImage (imageCurrentLocation, UIControlState.Normal);
+			_btnCurrentLocation.Frame = new RectangleF ((float)View.Frame.Width - 60, (float)View.Frame.Height - 120, (float)imageCurrentLocation.Size.Width, (float)imageCurrentLocation.Size.Height);
+
+			_btnCurrentLocation.TouchUpInside += (sender, e) => {
+				_mapView.SetCenterCoordinate(_mapView.UserLocation.Location.Coordinate, true);
+			};
+			View.AddSubview (_btnCurrentLocation);
 
 			// Add delegate for annotations to be able to customize the annotation
 			_mapView.GetViewForAnnotation = GetViewForAnnotation;

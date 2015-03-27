@@ -109,4 +109,10 @@
     <Compile Include="AnnotationModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Resources\images\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\images\currentlocation.png" />
+  </ItemGroup>
 </Project>
