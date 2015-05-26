@@ -107,6 +107,8 @@
     <Compile Include="MapViewController.cs" />
     <Compile Include="DataModel.cs" />
     <Compile Include="AnnotationModel.cs" />
+    <Compile Include="SearchDelegate.cs" />
+    <Compile Include="SearchSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
@@ -114,5 +116,6 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\images\currentlocation.png" />
+    <BundleResource Include="Resources\images\currentlocation%402x.png" />
   </ItemGroup>
 </Project>

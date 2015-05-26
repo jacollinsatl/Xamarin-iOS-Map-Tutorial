@@ -20,11 +20,18 @@ namespace XamariniOSMapKitTutorial
 		private UISegmentedControl mapTypes;
 		private UIButton _btnCurrentLocation;
 		private UIButton _annotationDetailButton; // Add this here to avoid the GC
+		private UISearchBar _searchBar;
+		private UISearchDisplayController _searchController;
+
+		public MKMapView Map { get { return _mapView; } }
 
 		protected string annotationIdentifier = "AnnotationIdentifier";
 
-		public MapViewController () : base (UITableViewStyle.Grouped, null)
+		public MapViewController () : base(UITableViewStyle.Grouped, null)
 		{
+			EnableSearch = true;
+			AutoHideSearch = false;
+
 			initializeMap ();
 			Root = new RootElement ("Map View") {};
 
@@ -66,12 +73,25 @@ namespace XamariniOSMapKitTutorial
 
 			_btnCurrentLocation = new UIButton () { TintColor = UIColor.Black };
 			_btnCurrentLocation.SetImage (imageCurrentLocation, UIControlState.Normal);
-			_btnCurrentLocation.Frame = new RectangleF ((float)View.Frame.Width - 60, (float)View.Frame.Height - 120, (float)imageCurrentLocation.Size.Width, (float)imageCurrentLocation.Size.Height);
+			_btnCurrentLocation.Frame = new RectangleF ((float)View.Frame.Width - 60, (float)View.Frame.Height - 100, (float)imageCurrentLocation.Size.Width, (float)imageCurrentLocation.Size.Height);
 
 			_btnCurrentLocation.TouchUpInside += (sender, e) => {
 				_mapView.SetCenterCoordinate(_mapView.UserLocation.Location.Coordinate, true);
 			};
 			View.AddSubview (_btnCurrentLocation);
+
+			_searchBar = new UISearchBar (new RectangleF(0, 0, (float)View.Frame.Width, 50)) {
+				Placeholder = "Enter search text",
+				AutocorrectionType = UITextAutocorrectionType.No,
+				TintColor = UIColor.Black
+			};
+
+			_searchBar.SearchBarStyle = UISearchBarStyle.Default;
+			_searchBar.SizeToFit ();
+			_searchController = new UISearchDisplayController (_searchBar, this);
+			_searchController.Delegate = new SearchDelegate ();
+			_searchController.SearchResultsSource = new SearchSource (_searchController, this);
+			View.AddSubview (_searchBar);
 
 			// Add delegate for annotations to be able to customize the annotation
 			_mapView.GetViewForAnnotation = GetViewForAnnotation;
@@ -99,7 +119,7 @@ namespace XamariniOSMapKitTutorial
 		} // end createAnnotationLocations
 
 		// Calculate the latitude degrees from a given km distance
-		private double kmToLatitudeDegrees(double kms)
+		public double kmToLatitudeDegrees(double kms)
 		{
 			double earthRadius = 6371.0; 
 			double radiansToDegrees = 180.0 / Math.PI;
@@ -108,7 +128,7 @@ namespace XamariniOSMapKitTutorial
 		} // end kmToLatitutdeDegrees
 
 		// Calculate the longitude degrees from a given km distance and at a certain latitude
-		private double kmToLongitudeDegrees(double kms, double atLatitude)
+		public double kmToLongitudeDegrees(double kms, double atLatitude)
 		{
 			double earthRadius = 6371.0; // in kms
 			double degreesToRadians = Math.PI/180.0;
